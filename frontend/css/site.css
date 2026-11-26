@@ -806,11 +806,18 @@ th {
     padding: clamp(1rem, 2.5vw, 2rem);
 }
 
-.report-content > .card {
+.topbar h2 {
+    color: var(--primary-dark);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    line-height: 1.25;
+}
+
+.content-wrapper > .card,
+.content-wrapper section.card {
     padding: clamp(1rem, 2vw, 1.5rem);
 }
 
-.report-content h3 {
+.content-wrapper .card h3 {
     border: 0;
     padding: 0;
     margin-bottom: 0.8rem;
@@ -863,30 +870,52 @@ th {
     overflow-wrap: anywhere;
 }
 
-.report-table {
+.workspace-table {
     overflow-x: auto;
     border: 1px solid var(--cream-border);
     border-radius: 12px;
 }
 
-.report-table table {
-    min-width: 500px;
+.workspace-table-spaced {
+    margin-top: 0.85rem;
 }
 
-.report-table table:has(#paidOrdersTableBody) {
+.workspace-table table {
+    min-width: 420px;
+}
+
+.workspace-table table:has(th:nth-child(7)) {
     min-width: 820px;
 }
 
-.report-table :is(th, td) {
+.workspace-table :is(th, td) {
     padding: 0.75rem;
 }
 
-.report-table tbody tr:nth-child(even) {
+.workspace-table tbody tr:nth-child(even) {
     background: #f7f8f3;
 }
 
-.report-table tbody tr:last-child td {
+.workspace-table tbody tr:last-child td {
     border-bottom: 0;
+}
+
+.prep-column h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.prep-count {
+    background: #e9f0e6;
+    color: var(--primary-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.grid-2 > *,
+.grid-3 > * {
+    min-width: 0;
 }
 
 @media (max-width: 1050px) {

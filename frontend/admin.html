@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản trị Hệ thống – Milky Tea – Trà sữa & Cà phê</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -26,7 +26,7 @@
                     <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
                     <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
                     <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
-                    <a href="/admin.html" id="navAdmin" class="active">⚙️ Quản trị hệ thống</a>
+                    <a href="/admin.html" id="navAdmin" class="active" aria-current="page">⚙️ Quản trị hệ thống</a>
                 </nav>
             </div>
 
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Quản trị Hệ thống (Đơn hàng • Nhân viên • Chi nhánh • Thực đơn & Giá bán)</h2>
+                    <h2>Quản trị hệ thống</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -71,20 +71,22 @@
                         </div>
                     </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Chi nhánh</th>
-                                <th>Thu ngân / Khách</th>
-                                <th>Chi tiết các ly (Đơn giá lúc bán)</th>
-                                <th>Thanh toán</th>
-                                <th>Pha chế</th>
-                                <th class="text-right">Tổng tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminOrdersBody"></tbody>
-                    </table>
+                    <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Chi nhánh</th>
+                                    <th>Thu ngân / Khách</th>
+                                    <th>Chi tiết các ly (Đơn giá lúc bán)</th>
+                                    <th>Thanh toán</th>
+                                    <th>Pha chế</th>
+                                    <th class="text-right">Tổng tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminOrdersBody"></tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <!-- MỤC 2: NHÂN VIÊN (4 VAI TRÒ) -->
@@ -122,18 +124,20 @@
 
                         <div>
                             <h4>Danh sách nhân viên toàn chuỗi</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Họ tên</th>
-                                        <th>Vai trò</th>
-                                        <th>Chi nhánh</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTableBody"></tbody>
-                            </table>
+                            <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Username</th>
+                                            <th>Họ tên</th>
+                                            <th>Vai trò</th>
+                                            <th>Chi nhánh</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -243,36 +247,40 @@
                     <!-- Bảng giá theo Món & Size -->
                     <div class="card" style="background:#fffdf9;">
                         <h4>1. Bảng giá theo Món & Kích cỡ (Size)</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tên món (Danh mục)</th>
-                                    <th>Kích cỡ</th>
-                                    <th class="text-right">Giá chung toàn chuỗi</th>
-                                    <th class="text-right">Giá riêng chi nhánh</th>
-                                    <th class="text-right">Giá thực tế đang áp dụng</th>
-                                    <th class="text-right">Thao tác đổi giá</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pricingVariantsTableBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tên món (Danh mục)</th>
+                                        <th>Kích cỡ</th>
+                                        <th class="text-right">Giá chung toàn chuỗi</th>
+                                        <th class="text-right">Giá riêng chi nhánh</th>
+                                        <th class="text-right">Giá thực tế đang áp dụng</th>
+                                        <th class="text-right">Thao tác đổi giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pricingVariantsTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Bảng giá Topping -->
                     <div class="card" style="background:#fffdf9;">
                         <h4>2. Bảng giá Topping</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tên Topping</th>
-                                    <th class="text-right">Giá chung toàn chuỗi</th>
-                                    <th class="text-right">Giá riêng chi nhánh</th>
-                                    <th class="text-right">Giá thực tế đang áp dụng</th>
-                                    <th class="text-right">Thao tác đổi giá</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pricingToppingsTableBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tên Topping</th>
+                                        <th class="text-right">Giá chung toàn chuỗi</th>
+                                        <th class="text-right">Giá riêng chi nhánh</th>
+                                        <th class="text-right">Giá thực tế đang áp dụng</th>
+                                        <th class="text-right">Thao tác đổi giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pricingToppingsTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Khu vực Thêm mới Danh mục / Món / Size / Topping (Chỉ Admin) -->
@@ -324,18 +332,20 @@
                     <!-- Bảng Lịch sử đổi giá -->
                     <div class="card">
                         <h4>4. Lịch sử thay đổi giá bán (Người sửa, Thời gian, Phạm vi, Giá cũ & Giá mới)</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Người sửa</th>
-                                    <th>Món / Size / Topping</th>
-                                    <th>Phạm vi ảnh hưởng</th>
-                                    <th class="text-right">Giá cũ &rarr; Giá mới</th>
-                                </tr>
-                            </thead>
-                            <tbody id="priceHistoryTableBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Người sửa</th>
+                                        <th>Món / Size / Topping</th>
+                                        <th>Phạm vi ảnh hưởng</th>
+                                        <th class="text-right">Giá cũ &rarr; Giá mới</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="priceHistoryTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
             </main>

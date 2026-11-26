@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quầy Pha chế (Barista) – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -22,7 +22,7 @@
 
                 <nav class="sidebar-nav">
                     <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
-                    <a href="/barista.html" id="navBarista" class="active">🧋 Quầy pha chế</a>
+                    <a href="/barista.html" id="navBarista" class="active" aria-current="page">🧋 Quầy pha chế</a>
                     <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
                     <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
                     <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Màn hình Điều phối Pha chế (Barista)</h2>
+                    <h2>Quầy pha chế</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -61,18 +61,18 @@
 
                 <!-- 3 Cột trạng thái pha chế: Chờ pha, Đang pha, Hoàn thành -->
                 <div class="grid-3">
-                    <section class="card" style="background:#fffaf3;">
-                        <h3>1. Chờ pha (<span id="countWaiting">0</span>)</h3>
+                    <section class="card prep-column">
+                        <h3>Chờ pha <span class="badge prep-count" id="countWaiting">0</span></h3>
                         <div id="colWaiting"></div>
                     </section>
 
-                    <section class="card" style="background:#f5f9ff;">
-                        <h3>2. Đang pha (<span id="countPreparing">0</span>)</h3>
+                    <section class="card prep-column">
+                        <h3>Đang pha <span class="badge prep-count" id="countPreparing">0</span></h3>
                         <div id="colPreparing"></div>
                     </section>
 
-                    <section class="card" style="background:#f4fbf7;">
-                        <h3>3. Hoàn thành (<span id="countCompleted">0</span>)</h3>
+                    <section class="card prep-column">
+                        <h3>Hoàn thành <span class="badge prep-count" id="countCompleted">0</span></h3>
                         <div id="colCompleted"></div>
                     </section>
                 </div>

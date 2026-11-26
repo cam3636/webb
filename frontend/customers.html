@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khách hàng Thân thiết – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -23,7 +23,7 @@
                 <nav class="sidebar-nav">
                     <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
                     <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
-                    <a href="/customers.html" id="navCustomers" class="active">🎁 Khách hàng thân thiết</a>
+                    <a href="/customers.html" id="navCustomers" class="active" aria-current="page">🎁 Khách hàng thân thiết</a>
                     <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
                     <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
                     <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Khách hàng Thân thiết & Lịch sử Tích điểm</h2>
+                    <h2>Khách hàng thân thiết</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -96,36 +96,40 @@
                             </div>
                         </div>
 
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Mã KH</th>
-                                    <th>Họ và tên</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Điểm hiện có</th>
-                                    <th>Số lần mua</th>
-                                    <th>Lần mua gần nhất</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="customersTableBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mã KH</th>
+                                        <th>Họ và tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Điểm hiện có</th>
+                                        <th>Số lần mua</th>
+                                        <th>Lần mua gần nhất</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section id="customerTxCard" class="card hidden">
                         <h3 id="customerTxTitle">Lịch sử tích điểm</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Mã hóa đơn</th>
-                                    <th>Chi nhánh</th>
-                                    <th class="text-right">Giá trị hóa đơn</th>
-                                    <th class="text-right">Điểm cộng</th>
-                                    <th>Thời gian thanh toán</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customerTxBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mã hóa đơn</th>
+                                        <th>Chi nhánh</th>
+                                        <th class="text-right">Giá trị hóa đơn</th>
+                                        <th class="text-right">Điểm cộng</th>
+                                        <th>Thời gian thanh toán</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customerTxBody"></tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
             </main>

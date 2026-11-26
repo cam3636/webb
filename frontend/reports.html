@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo cáo Doanh thu – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -25,7 +25,7 @@
                     <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
                     <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
                     <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
-                    <a href="/reports.html" id="navReports" class="active">📊 Báo cáo doanh thu</a>
+                    <a href="/reports.html" id="navReports" class="active" aria-current="page">📊 Báo cáo doanh thu</a>
                     <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
                 </nav>
             </div>
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Báo cáo doanh thu</h2>
+                    <h2>Báo cáo doanh thu</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -93,7 +93,7 @@
 
                 <section class="card">
                     <h3>Doanh thu theo món và kích cỡ</h3>
-                    <div class="report-table" tabindex="0" role="region" aria-label="Doanh thu theo món">
+                    <div class="workspace-table" tabindex="0" role="region" aria-label="Doanh thu theo món">
                         <table>
                             <thead>
                                 <tr>
@@ -110,7 +110,7 @@
 
                 <section class="card">
                     <h3>Đối chiếu đơn đã thanh toán</h3>
-                    <div class="report-table" tabindex="0" role="region" aria-label="Đối chiếu đơn đã thanh toán">
+                    <div class="workspace-table" tabindex="0" role="region" aria-label="Đối chiếu đơn đã thanh toán">
                         <table>
                             <thead>
                                 <tr>

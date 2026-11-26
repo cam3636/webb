@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kho Nguyên liệu & Lịch sử Nhập/Xuất – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -24,7 +24,7 @@
                     <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
                     <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
                     <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
-                    <a href="/inventory.html" id="navInventory" class="active">📦 Kho nguyên liệu</a>
+                    <a href="/inventory.html" id="navInventory" class="active" aria-current="page">📦 Kho nguyên liệu</a>
                     <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
                     <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
                 </nav>
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Quản lý Tồn kho & Phiếu Nhập/Xuất</h2>
+                    <h2>Kho nguyên liệu</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -60,17 +60,19 @@
                     <!-- Bảng tồn kho -->
                     <section class="card">
                         <h3 id="inventoryBranchTitle">Số lượng tồn kho hiện tại</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Mã NL</th>
-                                    <th>Tên nguyên liệu</th>
-                                    <th>Đơn vị</th>
-                                    <th class="text-right">Số lượng tồn</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryTableBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mã NL</th>
+                                        <th>Tên nguyên liệu</th>
+                                        <th>Đơn vị</th>
+                                        <th class="text-right">Số lượng tồn</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <!-- Lập phiếu nhập nhiều nguyên liệu -->
@@ -86,21 +88,23 @@
                         </div>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="addReceiptLine()">+ Thêm vào danh sách phiếu nhập</button>
 
-                        <table style="margin-top:0.85rem;">
-                            <thead>
-                                <tr>
-                                    <th>Nguyên liệu</th>
-                                    <th>Đơn vị</th>
-                                    <th class="text-right">SL nhập</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="receiptDraftBody">
-                                <tr>
-                                    <td colspan="4" style="text-align:center;">Chưa có nguyên liệu trong phiếu nhập.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="workspace-table workspace-table-spaced" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nguyên liệu</th>
+                                        <th>Đơn vị</th>
+                                        <th class="text-right">SL nhập</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="receiptDraftBody">
+                                    <tr>
+                                        <td colspan="4" style="text-align:center;">Chưa có nguyên liệu trong phiếu nhập.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="form-group" style="margin-top:0.85rem;">
                             <label for="receiptNoteInput">Ghi chú phiếu nhập</label>
@@ -117,32 +121,36 @@
                 <div class="grid-2">
                     <section class="card">
                         <h3>Lịch sử Nhập kho tại chi nhánh</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Phiếu & Thời gian</th>
-                                    <th>Người nhập</th>
-                                    <th>Chi tiết nguyên liệu (+)</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyInBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Phiếu & Thời gian</th>
+                                        <th>Người nhập</th>
+                                        <th>Chi tiết nguyên liệu (+)</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyInBody"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section class="card">
                         <h3>Lịch sử Xuất kho (Trừ tự động khi thanh toán đơn)</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Đơn hàng & Thời gian</th>
-                                    <th>Thu ngân</th>
-                                    <th>Nguyên liệu đã trừ (-)</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyOutBody"></tbody>
-                        </table>
+                        <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Đơn hàng & Thời gian</th>
+                                        <th>Thu ngân</th>
+                                        <th>Nguyên liệu đã trừ (-)</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyOutBody"></tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
             </main>

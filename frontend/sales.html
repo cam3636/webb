@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bán hàng tại quầy (POS) – Milky Tea – Trà sữa & Cà phê</title>
-    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+    <link rel="stylesheet" href="/css/site.css?v=workspace-3">
 </head>
 <body>
     <div class="app-shell">
@@ -21,7 +21,7 @@
                 </div>
 
                 <nav class="sidebar-nav">
-                    <a href="/sales.html" id="navSales" class="active">☕ Bán hàng tại quầy</a>
+                    <a href="/sales.html" id="navSales" class="active" aria-current="page">☕ Bán hàng tại quầy</a>
                     <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
                     <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
                     <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
@@ -40,7 +40,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
-                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Bán hàng tại quầy (POS)</h2>
+                    <h2>Bán hàng tại quầy</h2>
                 </div>
                 <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
             </header>
@@ -49,9 +49,8 @@
                 <div id="salesMessage" class="alert hidden"></div>
 
                 <!-- Banner Thông tin Chi nhánh đang bán: Tên cửa hàng + Địa chỉ cụ thể bên dưới -->
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:#fffaf3; border-left:5px solid var(--primary);">
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
                     <div>
-                        <div style="font-size:0.8rem; font-weight:700; color:var(--accent); text-transform:uppercase;">Milky Tea – Trà sữa & Cà phê</div>
                         <h3 id="sellingBranchTitle" style="margin-bottom:0.2rem; border:none; padding:0;">Đang bán tại...</h3>
                         <p id="sellingBranchAddress" style="font-size:0.88rem; color:var(--muted);"></p>
                     </div>
@@ -117,22 +116,24 @@
                                 <button type="button" class="btn btn-secondary btn-sm" onclick="clearCart()">Làm trống giỏ</button>
                             </div>
 
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Món / Topping / Ghi chú</th>
-                                        <th>SL</th>
-                                        <th class="text-right">Đơn giá</th>
-                                        <th class="text-right">Thành tiền</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cartTableBody">
-                                    <tr>
-                                        <td colspan="5" style="text-align:center; padding:1rem; color:var(--muted);">Giỏ hàng đang trống. Bấm chọn món ở danh sách bên trái.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Món / Topping / Ghi chú</th>
+                                            <th>SL</th>
+                                            <th class="text-right">Đơn giá</th>
+                                            <th class="text-right">Thành tiền</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cartTableBody">
+                                        <tr>
+                                            <td colspan="5" style="text-align:center; padding:1rem; color:var(--muted);">Giỏ hàng đang trống. Bấm chọn món ở danh sách bên trái.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <div style="border-top:2px solid var(--cream-border); margin-top:0.9rem; padding-top:0.85rem; display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-weight:700;">TỔNG TIỀN TẠM TÍNH:</span>
@@ -156,18 +157,20 @@
                             </p>
                             <p id="resCustomerInfo" style="font-size:0.88rem; margin-bottom:0.75rem;"></p>
 
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Món & Size</th>
-                                        <th>Topping</th>
-                                        <th>SL</th>
-                                        <th class="text-right">Giá ly</th>
-                                        <th class="text-right">Thành tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="resOrderItemsBody"></tbody>
-                            </table>
+                            <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Món & Size</th>
+                                            <th>Topping</th>
+                                            <th>SL</th>
+                                            <th class="text-right">Giá ly</th>
+                                            <th class="text-right">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resOrderItemsBody"></tbody>
+                                </table>
+                            </div>
 
                             <div style="display:flex; gap:0.65rem; margin-top:1rem; justify-content:flex-end; flex-wrap:wrap;">
                                 <button type="button" id="btnPayOrder" class="btn btn-success" onclick="payCurrentOrder()">✓ Xác nhận Thanh toán (Trừ kho & Tích điểm)</button>
@@ -188,21 +191,23 @@
                         <h3 style="margin-bottom:0; border:none;">Tra cứu Đơn hàng gần đây tại Chi nhánh</h3>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="loadBranchOrdersAtPos()">🔄 Làm mới danh sách đơn</button>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Thời gian</th>
-                                <th>Khách hàng</th>
-                                <th>Chi tiết món</th>
-                                <th>Thanh toán</th>
-                                <th>Pha chế</th>
-                                <th class="text-right">Tổng tiền</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="posBranchOrdersBody"></tbody>
-                    </table>
+                    <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Thời gian</th>
+                                    <th>Khách hàng</th>
+                                    <th>Chi tiết món</th>
+                                    <th>Thanh toán</th>
+                                    <th>Pha chế</th>
+                                    <th class="text-right">Tổng tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="posBranchOrdersBody"></tbody>
+                        </table>
+                    </div>
                 </section>
             </main>
         </div>
