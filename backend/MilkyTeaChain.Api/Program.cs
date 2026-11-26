@@ -134,7 +134,15 @@ if (Directory.Exists(activeFrontendPath))
 
     app.UseStaticFiles(new StaticFileOptions
     {
-        FileProvider = fileProvider
+        FileProvider = fileProvider,
+        OnPrepareResponse = context =>
+        {
+            var extension = Path.GetExtension(context.File.Name);
+            if (extension is ".html" or ".css" or ".js")
+            {
+                context.Context.Response.Headers.CacheControl = "no-cache";
+            }
+        }
     });
 }
 
