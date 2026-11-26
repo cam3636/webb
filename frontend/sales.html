@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bán hàng tại quầy (POS) – Milky Tea – Trà sữa & Cà phê</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales" class="active">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Bán hàng tại quầy (POS)</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper">
+                <div id="salesMessage" class="alert hidden"></div>
+
+                <!-- Banner Thông tin Chi nhánh đang bán: Tên cửa hàng + Địa chỉ cụ thể bên dưới -->
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; background:#fffaf3; border-left:5px solid var(--primary);">
+                    <div>
+                        <div style="font-size:0.8rem; font-weight:700; color:var(--accent); text-transform:uppercase;">Milky Tea – Trà sữa & Cà phê</div>
+                        <h3 id="sellingBranchTitle" style="margin-bottom:0.2rem; border:none; padding:0;">Đang bán tại...</h3>
+                        <p id="sellingBranchAddress" style="font-size:0.88rem; color:var(--muted);"></p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap;">
+                        <!-- Trên trang bán hàng của Admin: Chọn Tỉnh/Thành phố trước, sau đó chọn Cửa hàng -->
+                        <div id="adminPosBranchSelectors" class="hidden" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                            <div>
+                                <label for="posCitySelect" style="font-size:0.78rem; font-weight:700; display:block;">1. Tỉnh / Thành phố:</label>
+                                <select id="posCitySelect" onchange="onPosCityChange()" style="width:auto; min-width:155px;"></select>
+                            </div>
+                            <div>
+                                <label for="branchSelect" style="font-size:0.78rem; font-weight:700; display:block;">2. Cửa hàng:</label>
+                                <select id="branchSelect" onchange="onSellingBranchChange()" style="width:auto; min-width:230px;"></select>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <label for="lookupOrderIdInput" style="font-weight:600; font-size:0.88rem;">Tra cứu mã đơn:</label>
+                            <input type="number" id="lookupOrderIdInput" placeholder="VD: 1" style="width:85px;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="checkOrderStatus()">Kiểm tra</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khu vực Khách hàng thân thiết ngay tại quầy -->
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; flex:1;">
+                            <label for="posCustomerPhoneInput" style="font-weight:700; white-space:nowrap;">🎁 Tìm khách bằng số điện thoại:</label>
+                            <input type="text" id="posCustomerPhoneInput" placeholder="Nhập SĐT khách hàng..." style="max-width:210px;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="lookupCustomerAtPos()">Tìm khách</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="clearSelectedCustomer()">Khách lẻ</button>
+                        </div>
+                        <div id="selectedCustomerBanner" style="font-size:0.9rem;"></div>
+                    </div>
+
+                    <!-- Biểu mẫu tạo nhanh khách mới ngay tại quầy (giữ nguyên giỏ hàng) -->
+                    <div id="quickCreateCustomerBox" class="hidden" style="margin-top:0.85rem; padding-top:0.85rem; border-top:1px dashed var(--cream-border); display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                        <strong style="color:var(--primary-dark);">+ Đăng ký nhanh khách mới:</strong>
+                        <input type="text" id="quickCustomerName" placeholder="Họ và tên khách hàng..." style="max-width:220px;">
+                        <input type="text" id="quickCustomerPhone" placeholder="Số điện thoại..." style="max-width:170px;">
+                        <button type="button" class="btn btn-success btn-sm" onclick="createQuickCustomerAtPos()">Lưu & Chọn khách này</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('quickCreateCustomerBox').classList.add('hidden')">Đóng</button>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Cột trái: Danh mục, ô tìm món và lưới thẻ món -->
+                    <section class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.85rem;">
+                            <h3 style="margin-bottom:0; border:none;">Thực đơn thức uống</h3>
+                            <input type="text" id="searchProductInput" placeholder="🔍 Tìm tên món hoặc danh mục..." oninput="renderProductCards()" style="max-width:260px;">
+                        </div>
+
+                        <div id="categoryTabs" class="category-tabs"></div>
+                        <div id="productCardsGrid" class="product-cards-grid"></div>
+                    </section>
+
+                    <!-- Cột phải: Giỏ hàng bên cạnh, nút thanh toán và phiếu in -->
+                    <section>
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                                <h3 style="margin-bottom:0; border:none;">Giỏ hàng hiện tại</h3>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="clearCart()">Làm trống giỏ</button>
+                            </div>
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Món / Topping / Ghi chú</th>
+                                        <th>SL</th>
+                                        <th class="text-right">Đơn giá</th>
+                                        <th class="text-right">Thành tiền</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding:1rem; color:var(--muted);">Giỏ hàng đang trống. Bấm chọn món ở danh sách bên trái.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style="border-top:2px solid var(--cream-border); margin-top:0.9rem; padding-top:0.85rem; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:700;">TỔNG TIỀN TẠM TÍNH:</span>
+                                <strong id="cartEstimatedTotal" style="font-size:1.35rem; color:var(--primary-dark);">0 đ</strong>
+                            </div>
+
+                            <div style="display:flex; gap:0.65rem; margin-top:0.9rem; flex-wrap:wrap;">
+                                <button type="button" id="btnCreateOrder" class="btn btn-primary" style="flex:1;" onclick="createOrder(false)">1. Tạo đơn (Pending)</button>
+                                <button type="button" id="btnQuickPay" class="btn btn-success" style="flex:1.2;" onclick="createAndPayImmediately(false)">⚡ Tạo đơn & Thanh toán ngay</button>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin đơn vừa tạo & Phiếu bán hàng có thể in -->
+                        <div id="orderResultCard" class="card hidden">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                                <h3 style="margin-bottom:0; border:none;">Đơn hàng <span id="resOrderId"></span></h3>
+                                <span id="resOrderStatus" class="badge badge-pending">Pending</span>
+                            </div>
+                            <p style="font-size:0.88rem; color:var(--muted); margin:0.35rem 0 0.25rem;">
+                                Cửa hàng: <strong id="resBranchName"></strong> | Tổng tiền API: <strong id="resTotalAmount" style="color:var(--primary-dark); font-size:1.1rem;"></strong>
+                            </p>
+                            <p id="resCustomerInfo" style="font-size:0.88rem; margin-bottom:0.75rem;"></p>
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Món & Size</th>
+                                        <th>Topping</th>
+                                        <th>SL</th>
+                                        <th class="text-right">Giá ly</th>
+                                        <th class="text-right">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resOrderItemsBody"></tbody>
+                            </table>
+
+                            <div style="display:flex; gap:0.65rem; margin-top:1rem; justify-content:flex-end; flex-wrap:wrap;">
+                                <button type="button" id="btnPayOrder" class="btn btn-success" onclick="payCurrentOrder()">✓ Xác nhận Thanh toán (Trừ kho & Tích điểm)</button>
+                                <button type="button" class="btn btn-secondary" onclick="printSalesReceipt()">🖨️ In phiếu bán hàng</button>
+                            </div>
+
+                            <div style="margin-top:1rem;">
+                                <h4 style="font-size:0.9rem;">Xem trước Phiếu bán hàng (Khu vực in):</h4>
+                                <div id="receiptPrintArea" class="printable-receipt"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Danh sách tra cứu đơn hàng của chi nhánh đang bán (Dành cho Cashier & Admin) -->
+                <section class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.75rem;">
+                        <h3 style="margin-bottom:0; border:none;">Tra cứu Đơn hàng gần đây tại Chi nhánh</h3>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="loadBranchOrdersAtPos()">🔄 Làm mới danh sách đơn</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Thời gian</th>
+                                <th>Khách hàng</th>
+                                <th>Chi tiết món</th>
+                                <th>Thanh toán</th>
+                                <th>Pha chế</th>
+                                <th class="text-right">Tổng tiền</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="posBranchOrdersBody"></tbody>
+                    </table>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Chọn Size, Topping, Số lượng, Ghi chú khi bấm vào thẻ món -->
+    <div id="itemConfigModal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h3 id="modalProductTitle">Chọn món</h3>
+
+            <div class="form-group">
+                <label for="modalVariantSelect">1. Chọn Kích cỡ (Size & Giá bán tại chi nhánh)</label>
+                <select id="modalVariantSelect"></select>
+            </div>
+
+            <div class="form-group">
+                <label>2. Chọn Topping thêm</label>
+                <div id="modalToppingContainer" class="topping-list"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="modalQtyInput">3. Số lượng ly</label>
+                <input type="number" id="modalQtyInput" value="1" min="1" max="100">
+            </div>
+
+            <div class="form-group">
+                <label for="modalNoteInput">4. Ghi chú riêng cho ly này (Đá, đường, yêu cầu thêm...)</label>
+                <input type="text" id="modalNoteInput" placeholder="VD: 50% đường, ít đá, để riêng trân châu...">
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeItemModal()">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="confirmModalItem()">Lưu vào giỏ hàng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/sales.js"></script>
+</body>
+</html>

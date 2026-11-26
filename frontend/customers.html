@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khách hàng Thân thiết – Milky Tea Chain</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers" class="active">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Khách hàng Thân thiết & Lịch sử Tích điểm</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper">
+                <div id="customerMessage" class="alert hidden"></div>
+                <div id="cashierLookupNotice" class="alert alert-warn hidden">
+                    Chế độ Thu ngân: Bạn được phép tra cứu khách hàng theo số điện thoại và đăng ký khách hàng mới (Quy tắc tích điểm: 10.000 đ = 1 điểm).
+                </div>
+
+                <div class="grid-2">
+                    <!-- Tra cứu khách bằng số điện thoại -->
+                    <section class="card">
+                        <h3>Tra cứu khách hàng theo Số điện thoại</h3>
+                        <p style="font-size:0.86rem; color:var(--muted); margin-bottom:0.75rem;">
+                            Một số điện thoại dùng chung một hồ sơ trên toàn chuỗi. Hệ thống tự chuẩn hóa số điện thoại khi tìm hoặc lưu.
+                        </p>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="text" id="lookupPhoneInput" placeholder="Nhập SĐT (VD: 0909123456 hoặc +84909123456)...">
+                            <button type="button" class="btn btn-primary" style="white-space:nowrap;" onclick="lookupSingleCustomer()">🔍 Tìm khách</button>
+                        </div>
+                        <div id="lookupSingleResult" class="hidden" style="margin-top:0.85rem;"></div>
+                    </section>
+
+                    <!-- Đăng ký khách hàng mới -->
+                    <section class="card">
+                        <h3>Đăng ký Khách hàng Thân thiết mới</h3>
+                        <form id="createCustomerForm" onsubmit="handleCreateCustomer(event)">
+                            <div class="form-group">
+                                <label for="newCustName">Họ và tên khách hàng</label>
+                                <input type="text" id="newCustName" placeholder="VD: Nguyễn Văn A" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newCustPhone">Số điện thoại</label>
+                                <input type="text" id="newCustPhone" placeholder="VD: 0909123456" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">+ Đăng ký khách hàng</button>
+                        </form>
+                    </section>
+                </div>
+
+                <!-- Danh bạ khách hàng & Lịch sử giao dịch (Dành cho Admin & Manager) -->
+                <div id="fullDirectorySection">
+                    <section class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.75rem;">
+                            <div>
+                                <h3 style="margin-bottom:0; border:none;">Danh sách Khách hàng Thân thiết</h3>
+                                <small id="directoryScopeLabel" style="color:var(--muted); font-weight:600;"></small>
+                            </div>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input type="text" id="dirSearchInput" placeholder="Tìm theo tên hoặc SĐT..." oninput="loadCustomersDirectory()" style="width:220px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="loadCustomersDirectory()">🔄 Làm mới</button>
+                            </div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã KH</th>
+                                    <th>Họ và tên</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Điểm hiện có</th>
+                                    <th>Số lần mua</th>
+                                    <th>Lần mua gần nhất</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody"></tbody>
+                        </table>
+                    </section>
+
+                    <section id="customerTxCard" class="card hidden">
+                        <h3 id="customerTxTitle">Lịch sử tích điểm</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã hóa đơn</th>
+                                    <th>Chi nhánh</th>
+                                    <th class="text-right">Giá trị hóa đơn</th>
+                                    <th class="text-right">Điểm cộng</th>
+                                    <th>Thời gian thanh toán</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customerTxBody"></tbody>
+                        </table>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/customers.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quầy Pha chế (Barista) – Milky Tea Chain</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista" class="active">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Màn hình Điều phối Pha chế (Barista)</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper">
+                <div id="baristaMessage" class="alert hidden"></div>
+
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                    <div style="display:flex; align-items:center; gap:0.65rem;">
+                        <strong id="branchStaticLabel">Quầy pha chế Chi nhánh</strong>
+                        <select id="branchSelect" class="hidden" onchange="loadBaristaOrders()" style="width:auto; min-width:240px;"></select>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <small id="lastSyncTime" style="color:var(--muted);">Tự động cập nhật mỗi 5 giây</small>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="loadBaristaOrders()">🔄 Làm mới ngay</button>
+                    </div>
+                </div>
+
+                <!-- 3 Cột trạng thái pha chế: Chờ pha, Đang pha, Hoàn thành -->
+                <div class="grid-3">
+                    <section class="card" style="background:#fffaf3;">
+                        <h3>1. Chờ pha (<span id="countWaiting">0</span>)</h3>
+                        <div id="colWaiting"></div>
+                    </section>
+
+                    <section class="card" style="background:#f5f9ff;">
+                        <h3>2. Đang pha (<span id="countPreparing">0</span>)</h3>
+                        <div id="colPreparing"></div>
+                    </section>
+
+                    <section class="card" style="background:#f4fbf7;">
+                        <h3>3. Hoàn thành (<span id="countCompleted">0</span>)</h3>
+                        <div id="colCompleted"></div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/barista.js"></script>
+</body>
+</html>

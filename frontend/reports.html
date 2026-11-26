@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Doanh thu – Milky Tea Chain</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports" class="active">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Báo cáo doanh thu</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper report-content">
+                <div id="reportMessage" class="alert hidden"></div>
+
+                <section class="card">
+                    <h3>Bộ lọc báo cáo</h3>
+                    <p class="report-note">Doanh thu được tính từ các đơn đã thanh toán.</p>
+                    <div class="report-filters">
+                        <div>
+                            <label for="reportScopeSelect" style="font-weight:600; display:block; margin-bottom:0.3rem;">Chi nhánh / Phạm vi</label>
+                            <span id="reportScopeStatic" style="font-weight:700; color:var(--primary-dark);"></span>
+                            <select id="reportScopeSelect" class="hidden" onchange="loadRevenueReport()"></select>
+                        </div>
+                        <div>
+                            <label for="fromDateInput" style="font-weight:600; display:block; margin-bottom:0.3rem;">Từ ngày</label>
+                            <input type="date" id="fromDateInput" onchange="loadRevenueReport()">
+                        </div>
+                        <div>
+                            <label for="toDateInput" style="font-weight:600; display:block; margin-bottom:0.3rem;">Đến ngày</label>
+                            <input type="date" id="toDateInput" onchange="loadRevenueReport()">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary" style="width:100%;" onclick="loadRevenueReport()">Áp dụng bộ lọc</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4 chỉ số KPI: Phạm vi, Số đơn đã thanh toán, Tổng doanh thu, Giá trị trung bình mỗi đơn -->
+                <section class="kpi-grid">
+                    <div class="kpi-box">
+                        <div class="label">Phạm vi báo cáo</div>
+                        <div class="value" id="kpiScope" style="font-size:1.15rem;">-</div>
+                    </div>
+                    <div class="kpi-box">
+                        <div class="label">Đơn đã thanh toán</div>
+                        <div class="value" id="kpiPaidOrders">0</div>
+                    </div>
+                    <div class="kpi-box kpi-revenue">
+                        <div class="label">Tổng doanh thu thực thu</div>
+                        <div class="value" id="kpiTotalRevenue">0 đ</div>
+                    </div>
+                    <div class="kpi-box">
+                        <div class="label">Giá trị trung bình mỗi đơn</div>
+                        <div class="value" id="kpiAvgOrder">0 đ</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3>Doanh thu theo món và kích cỡ</h3>
+                    <div class="report-table" tabindex="0" role="region" aria-label="Doanh thu theo món">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tên món</th>
+                                    <th>Kích cỡ</th>
+                                    <th>Số lượng ly đã bán</th>
+                                    <th class="text-right">Doanh thu dòng món (gồm topping)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productSalesBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3>Đối chiếu đơn đã thanh toán</h3>
+                    <div class="report-table" tabindex="0" role="region" aria-label="Đối chiếu đơn đã thanh toán">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Chi nhánh</th>
+                                    <th>Thu ngân</th>
+                                    <th>Chi tiết món & Ghi chú</th>
+                                    <th>Thanh toán</th>
+                                    <th>Pha chế</th>
+                                    <th class="text-right">Tổng tiền & Thời điểm</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paidOrdersTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/reports.js"></script>
+</body>
+</html>

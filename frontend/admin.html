@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị Hệ thống – Milky Tea – Trà sữa & Cà phê</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin" class="active">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Quản trị Hệ thống (Đơn hàng • Nhân viên • Chi nhánh • Thực đơn & Giá bán)</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper">
+                <div id="adminMessage" class="alert hidden"></div>
+
+                <!-- 4 Mục riêng biệt: Đơn hàng, Nhân viên, Chi nhánh, Thực đơn & Giá bán -->
+                <div class="sub-tabs">
+                    <button type="button" id="tabBtnOrders" class="sub-tab-btn active" onclick="switchAdminTab('Orders')">🧾 1. Đơn hàng</button>
+                    <button type="button" id="tabBtnUsers" class="sub-tab-btn" onclick="switchAdminTab('Users')">👥 2. Nhân viên</button>
+                    <button type="button" id="tabBtnBranches" class="sub-tab-btn" onclick="switchAdminTab('Branches')">🏪 3. Chi nhánh</button>
+                    <button type="button" id="tabBtnMenu" class="sub-tab-btn" onclick="switchAdminTab('Menu')">🍵 4. Thực đơn & Giá bán</button>
+                </div>
+
+                <!-- MỤC 1: ĐƠN HÀNG -->
+                <section id="panelOrders" class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:0.85rem;">
+                        <h3 style="margin-bottom:0; border:none;">Quản lý & Tra cứu Đơn hàng</h3>
+                        <div style="display:flex; gap:0.65rem; align-items:center; flex-wrap:wrap;">
+                            <select id="orderFilterBranch" onchange="loadAdminOrders()" style="width:auto; min-width:210px;"></select>
+                            <select id="orderFilterStatus" onchange="loadAdminOrders()" style="width:auto;">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Paid">Đã thanh toán (Paid)</option>
+                                <option value="Pending">Chờ thanh toán (Pending)</option>
+                            </select>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminOrders()">🔄 Làm mới</button>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Chi nhánh</th>
+                                <th>Thu ngân / Khách</th>
+                                <th>Chi tiết các ly (Đơn giá lúc bán)</th>
+                                <th>Thanh toán</th>
+                                <th>Pha chế</th>
+                                <th class="text-right">Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOrdersBody"></tbody>
+                    </table>
+                </section>
+
+                <!-- MỤC 2: NHÂN VIÊN (4 VAI TRÒ) -->
+                <section id="panelUsers" class="card hidden">
+                    <h3>Quản lý Tài khoản Nhân viên (4 vai trò: Admin, Manager, Cashier, Barista)</h3>
+                    <div class="grid-2">
+                        <form id="createUserForm" onsubmit="handleCreateUser(event)">
+                            <div class="form-group">
+                                <label for="newUsername">Tên đăng nhập</label>
+                                <input type="text" id="newUsername" placeholder="VD: barista_b" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Mật khẩu</label>
+                                <input type="password" id="newPassword" placeholder="Nhập mật khẩu..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newFullName">Họ và tên nhân viên</label>
+                                <input type="text" id="newFullName" placeholder="VD: Pha chế Chi nhánh B" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newUserRoleSelect">Vai trò (4 vai trò)</label>
+                                <select id="newUserRoleSelect" onchange="onNewUserRoleChange()">
+                                    <option value="Cashier">Cashier (Thu ngân bán hàng)</option>
+                                    <option value="Barista">Barista (Nhân viên pha chế)</option>
+                                    <option value="Manager">Manager (Quản lý chi nhánh)</option>
+                                    <option value="Admin">Admin (Quản trị toàn chuỗi)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="newUserBranchSelect">Chi nhánh được giao</label>
+                                <select id="newUserBranchSelect"></select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">✓ Tạo tài khoản nhân viên</button>
+                        </form>
+
+                        <div>
+                            <h4>Danh sách nhân viên toàn chuỗi</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Họ tên</th>
+                                        <th>Vai trò</th>
+                                        <th>Chi nhánh</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MỤC 3: CHI NHÁNH -->
+                <section id="panelBranches" class="card hidden">
+                    <h3>Quản lý Chi nhánh / Cửa hàng – Milky Tea – Trà sữa & Cà phê</h3>
+
+                    <!-- Thống kê tự động số chi nhánh đang hoạt động theo Tỉnh/Thành phố (VD: Đà Nẵng (2), Huế (1)) -->
+                    <div id="cityActiveCountsBar" style="display:flex; flex-wrap:wrap; gap:0.65rem; margin-bottom:1rem;"></div>
+
+                    <!-- Thanh Tìm kiếm & Lọc chi nhánh -->
+                    <div class="card" style="background:#fffaf3; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1; flex-wrap:wrap;">
+                            <label for="branchSearchInput" style="font-weight:700; white-space:nowrap;">🔍 Tìm chi nhánh / tên quán:</label>
+                            <input type="text" id="branchSearchInput" placeholder="Nhập mã (DN01, HUE01), tên quán, tỉnh/TP, địa chỉ..." oninput="filterBranchesTable()" style="max-width:300px;">
+                            <select id="branchCityFilter" onchange="filterBranchesTable()" style="width:auto;">
+                                <option value="ALL">Tất cả Tỉnh/Thành phố</option>
+                            </select>
+                            <select id="branchStatusFilter" onchange="filterBranchesTable()" style="width:auto;">
+                                <option value="ALL">Tất cả trạng thái</option>
+                                <option value="ACTIVE">Đang hoạt động</option>
+                                <option value="INACTIVE">Ngừng hoạt động</option>
+                            </select>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="searchBranchesFromApi()">Tìm từ máy chủ</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="clearBranchSearch()">Xóa lọc</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="resetBranchForm()">+ Tạo chi nhánh / quán mới</button>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <!-- Biểu mẫu Thêm / Chỉnh sửa Chi nhánh & Tên quán -->
+                        <form id="createBranchForm" onsubmit="promptConfirmSaveBranch(event)" class="card" style="margin-bottom:0;">
+                            <h4 id="branchFormTitle">Thêm chi nhánh / cửa hàng mới</h4>
+                            <input type="hidden" id="editingBranchId" value="">
+
+                            <div class="form-group">
+                                <label for="branchCodeInput">Mã chi nhánh *</label>
+                                <input type="text" id="branchCodeInput" placeholder="VD: DN01, DN02, HUE01..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="branchNameInput">Tên quán / Tên cửa hàng chi nhánh *</label>
+                                <input type="text" id="branchNameInput" placeholder="VD: Milky Tea Nguyễn Văn Linh" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="branchCityInput">Tỉnh / Thành phố *</label>
+                                <input type="text" id="branchCityInput" list="citySuggestions" placeholder="VD: Đà Nẵng, Huế..." required>
+                                <datalist id="citySuggestions">
+                                    <option value="Đà Nẵng"></option>
+                                    <option value="Huế"></option>
+                                    <option value="TP.HCM"></option>
+                                    <option value="Hà Nội"></option>
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="branchAddressInput">Địa chỉ cụ thể của quán *</label>
+                                <input type="text" id="branchAddressInput" placeholder="VD: đường Nguyễn Văn Linh" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="branchPhoneInput">Số điện thoại hotline quán</label>
+                                <input type="text" id="branchPhoneInput" placeholder="VD: 0901000001">
+                            </div>
+                            <div class="form-group">
+                                <label for="branchHoursInput">Giờ mở cửa phục vụ</label>
+                                <input type="text" id="branchHoursInput" value="07:00 - 22:30" placeholder="VD: 07:00 - 22:30">
+                            </div>
+                            <div class="form-group">
+                                <label for="branchActiveSelect">Trạng thái hoạt động</label>
+                                <select id="branchActiveSelect">
+                                    <option value="true">Đang hoạt động</option>
+                                    <option value="false">Tạm ngừng hoạt động</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                                <button type="submit" id="btnSaveBranch" class="btn btn-primary" style="flex:1;">✓ Kiểm tra & Lưu chi nhánh</button>
+                                <button type="button" id="btnCancelEditBranch" class="btn btn-secondary hidden" onclick="resetBranchForm()">Hủy chỉnh sửa</button>
+                            </div>
+                        </form>
+
+                        <!-- Danh sách chi nhánh được nhóm theo Tỉnh/Thành phố -->
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                                <h4 style="margin-bottom:0; border:none;">Danh sách cửa hàng theo Tỉnh/Thành phố (<span id="branchCountLabel">0</span>)</h4>
+                                <small style="color:var(--muted);">Bấm "✏️ Chỉnh sửa" để sửa tên, địa chỉ, tỉnh/TP hoặc trạng thái</small>
+                            </div>
+                            <div id="groupedBranchesContainer"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MỤC 4: THỰC ĐƠN & QUẢN LÝ GIÁ BÁN -->
+                <section id="panelMenu" class="card hidden">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                        <div>
+                            <h3 style="margin-bottom:0; border:none;">Quản lý Thực đơn, Giá chung Toàn chuỗi & Giá riêng Chi nhánh</h3>
+                            <small style="color:var(--muted);">Admin đặt giá chung hoặc giá riêng; Manager đặt giá riêng hoặc chọn "Dùng lại giá chung" cho chi nhánh phụ trách.</small>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <label for="pricingBranchSelect" style="font-weight:700;">Chi nhánh đang xem/đặt giá riêng:</label>
+                            <select id="pricingBranchSelect" onchange="loadAdminMenuData()" style="width:auto; min-width:220px;"></select>
+                        </div>
+                    </div>
+
+                    <!-- Bảng giá theo Món & Size -->
+                    <div class="card" style="background:#fffdf9;">
+                        <h4>1. Bảng giá theo Món & Kích cỡ (Size)</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tên món (Danh mục)</th>
+                                    <th>Kích cỡ</th>
+                                    <th class="text-right">Giá chung toàn chuỗi</th>
+                                    <th class="text-right">Giá riêng chi nhánh</th>
+                                    <th class="text-right">Giá thực tế đang áp dụng</th>
+                                    <th class="text-right">Thao tác đổi giá</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pricingVariantsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bảng giá Topping -->
+                    <div class="card" style="background:#fffdf9;">
+                        <h4>2. Bảng giá Topping</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tên Topping</th>
+                                    <th class="text-right">Giá chung toàn chuỗi</th>
+                                    <th class="text-right">Giá riêng chi nhánh</th>
+                                    <th class="text-right">Giá thực tế đang áp dụng</th>
+                                    <th class="text-right">Thao tác đổi giá</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pricingToppingsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Khu vực Thêm mới Danh mục / Món / Size / Topping (Chỉ Admin) -->
+                    <div id="adminOnlyMenuCreation" class="card">
+                        <h4>3. Thêm mới Danh mục, Món, Size hoặc Topping (Dành cho Admin)</h4>
+                        <div class="grid-2">
+                            <div>
+                                <form onsubmit="handleCreateCategory(event)" style="margin-bottom:1rem;">
+                                    <label style="font-weight:600; display:block; margin-bottom:0.3rem;">Thêm danh mục thức uống</label>
+                                    <div style="display:flex; gap:0.5rem;">
+                                        <input type="text" id="catNameInput" placeholder="VD: Trà trái cây" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Thêm danh mục</button>
+                                    </div>
+                                </form>
+
+                                <form onsubmit="handleCreateProduct(event)">
+                                    <label style="font-weight:600; display:block; margin-bottom:0.3rem;">Thêm món mới vào danh mục</label>
+                                    <div style="display:flex; gap:0.5rem;">
+                                        <select id="prodCategorySelect" style="max-width:160px;"></select>
+                                        <input type="text" id="prodNameInput" placeholder="VD: Trà đào cam sả" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Thêm món</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div>
+                                <form onsubmit="handleSaveVariant(event)" style="margin-bottom:1rem;">
+                                    <label style="font-weight:600; display:block; margin-bottom:0.3rem;">Thêm Size & Giá chung cho món</label>
+                                    <div style="display:flex; gap:0.5rem;">
+                                        <select id="varProductSelect"></select>
+                                        <input type="text" id="varSizeInput" placeholder="Size (M/L)" style="width:95px;" required>
+                                        <input type="number" id="varPriceInput" placeholder="Giá chung" style="width:120px;" min="1000" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">Lưu Size</button>
+                                    </div>
+                                </form>
+
+                                <form onsubmit="handleSaveTopping(event)">
+                                    <label style="font-weight:600; display:block; margin-bottom:0.3rem;">Thêm Topping mới</label>
+                                    <div style="display:flex; gap:0.5rem;">
+                                        <input type="text" id="topNameInput" placeholder="Tên topping" required>
+                                        <input type="number" id="topPriceInput" placeholder="Giá chung" style="width:130px;" min="0" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">Lưu Topping</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng Lịch sử đổi giá -->
+                    <div class="card">
+                        <h4>4. Lịch sử thay đổi giá bán (Người sửa, Thời gian, Phạm vi, Giá cũ & Giá mới)</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Người sửa</th>
+                                    <th>Món / Size / Topping</th>
+                                    <th>Phạm vi ảnh hưởng</th>
+                                    <th class="text-right">Giá cũ &rarr; Giá mới</th>
+                                </tr>
+                            </thead>
+                            <tbody id="priceHistoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Hộp thoại Xác nhận trước khi Lưu Thêm mới / Chỉnh sửa Chi nhánh -->
+    <div id="branchConfirmModal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h3 id="branchCfmModalTitle">Xác nhận Lưu thông tin Chi nhánh</h3>
+            <p style="font-size:0.9rem; color:var(--muted); margin-bottom:0.85rem;">
+                Vui lòng kiểm tra kỹ thông tin tên quán, địa chỉ và giờ mở cửa trước khi xác nhận lưu vào hệ thống.
+            </p>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Thao tác:</th>
+                        <td><span id="branchCfmActionType" class="badge badge-preparing"></span></td>
+                    </tr>
+                    <tr>
+                        <th>Mã chi nhánh:</th>
+                        <td><strong id="branchCfmCode"></strong></td>
+                    </tr>
+                    <tr>
+                        <th>Tên quán / Cửa hàng:</th>
+                        <td><strong id="branchCfmName" style="color:var(--primary-dark); font-size:1.05rem;"></strong></td>
+                    </tr>
+                    <tr>
+                        <th>Tỉnh / Thành phố:</th>
+                        <td><strong id="branchCfmCity"></strong></td>
+                    </tr>
+                    <tr>
+                        <th>Địa chỉ cụ thể:</th>
+                        <td id="branchCfmAddress"></td>
+                    </tr>
+                    <tr>
+                        <th>Số điện thoại:</th>
+                        <td id="branchCfmPhone"></td>
+                    </tr>
+                    <tr>
+                        <th>Giờ mở cửa:</th>
+                        <td id="branchCfmHours"></td>
+                    </tr>
+                    <tr>
+                        <th>Trạng thái hoạt động:</th>
+                        <td id="branchCfmStatus"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1.15rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeBranchConfirmModal()">Quay lại sửa</button>
+                <button type="button" class="btn btn-primary" onclick="executeConfirmedSaveBranch()">✓ Xác nhận & Lưu Chi nhánh</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hộp thoại Xác nhận trước khi lưu thay đổi giá bán -->
+    <div id="priceConfirmModal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h3>Xác nhận Thay đổi Giá bán</h3>
+            <p style="font-size:0.9rem; color:var(--muted); margin-bottom:0.85rem;">
+                Vui lòng kiểm tra kỹ thông tin trước khi lưu. Các hóa đơn đã thanh toán trước đó sẽ giữ nguyên giá cũ.
+            </p>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Tên món / Topping:</th>
+                        <td><strong id="cfmItemName"></strong></td>
+                    </tr>
+                    <tr>
+                        <th>Kích cỡ / Loại:</th>
+                        <td id="cfmSizeOrType"></td>
+                    </tr>
+                    <tr>
+                        <th>Giá cũ:</th>
+                        <td id="cfmOldPrice"></td>
+                    </tr>
+                    <tr>
+                        <th>Giá mới:</th>
+                        <td><strong id="cfmNewPrice" style="color:var(--primary-dark); font-size:1.1rem;"></strong></td>
+                    </tr>
+                    <tr>
+                        <th>Phạm vi ảnh hưởng:</th>
+                        <td><span id="cfmScope" class="badge badge-pending"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1.15rem;">
+                <button type="button" class="btn btn-secondary" onclick="closePriceConfirmModal()">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="confirmAndSavePriceChange()">✓ Xác nhận Lưu giá mới</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

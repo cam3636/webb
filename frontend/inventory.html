@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho Nguyên liệu & Lịch sử Nhập/Xuất – Milky Tea Chain</title>
+    <link rel="stylesheet" href="/css/site.css?v=workspace-2">
+</head>
+<body>
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h1>Milky Tea</h1>
+                    <p>Hệ thống Quản lý Chuỗi</p>
+                </div>
+
+                <div class="sidebar-branch-box">
+                    <span class="branch-title">Chi nhánh đang làm việc:</span>
+                    <span id="sidebarBranchText">Đang tải...</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/sales.html" id="navSales">☕ Bán hàng tại quầy</a>
+                    <a href="/barista.html" id="navBarista">🧋 Quầy pha chế</a>
+                    <a href="/customers.html" id="navCustomers">🎁 Khách hàng thân thiết</a>
+                    <a href="/inventory.html" id="navInventory" class="active">📦 Kho nguyên liệu</a>
+                    <a href="/reports.html" id="navReports">📊 Báo cáo doanh thu</a>
+                    <a href="/admin.html" id="navAdmin">⚙️ Quản trị hệ thống</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div id="navUserBadge" class="sidebar-user"></div>
+                <button type="button" class="btn btn-danger" style="width:100%;" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
+                    <h2 style="font-size:1.15rem; color:var(--primary-dark);">Quản lý Tồn kho & Phiếu Nhập/Xuất</h2>
+                </div>
+                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+            </header>
+
+            <main class="content-wrapper">
+                <div id="inventoryMessage" class="alert hidden"></div>
+
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                    <div style="display:flex; align-items:center; gap:0.65rem;">
+                        <strong id="branchStaticLabel">Kho chi nhánh</strong>
+                        <select id="branchSelect" class="hidden" onchange="reloadAllInventoryData()" style="width:auto; min-width:240px;"></select>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="reloadAllInventoryData()">🔄 Tải lại tồn kho & lịch sử</button>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Bảng tồn kho -->
+                    <section class="card">
+                        <h3 id="inventoryBranchTitle">Số lượng tồn kho hiện tại</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã NL</th>
+                                    <th>Tên nguyên liệu</th>
+                                    <th>Đơn vị</th>
+                                    <th class="text-right">Số lượng tồn</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody"></tbody>
+                        </table>
+                    </section>
+
+                    <!-- Lập phiếu nhập nhiều nguyên liệu -->
+                    <section class="card">
+                        <h3>Lập phiếu nhập kho (nhiều nguyên liệu)</h3>
+                        <div class="form-group">
+                            <label for="ingredientSelect">Chọn nguyên liệu</label>
+                            <select id="ingredientSelect"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="receiptQtyInput">Số lượng nhập thêm</label>
+                            <input type="number" id="receiptQtyInput" value="500" min="1" step="any">
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addReceiptLine()">+ Thêm vào danh sách phiếu nhập</button>
+
+                        <table style="margin-top:0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Nguyên liệu</th>
+                                    <th>Đơn vị</th>
+                                    <th class="text-right">SL nhập</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="receiptDraftBody">
+                                <tr>
+                                    <td colspan="4" style="text-align:center;">Chưa có nguyên liệu trong phiếu nhập.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="form-group" style="margin-top:0.85rem;">
+                            <label for="receiptNoteInput">Ghi chú phiếu nhập</label>
+                            <input type="text" id="receiptNoteInput" placeholder="VD: Nhập nguyên liệu định kỳ ca sáng">
+                        </div>
+
+                        <button type="button" id="btnSubmitReceipt" class="btn btn-primary" style="width:100%;" onclick="submitStockReceipt()">
+                            ✓ Lưu Phiếu Nhập Kho
+                        </button>
+                    </section>
+                </div>
+
+                <!-- Lịch sử Nhập kho & Xuất kho bán hàng -->
+                <div class="grid-2">
+                    <section class="card">
+                        <h3>Lịch sử Nhập kho tại chi nhánh</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phiếu & Thời gian</th>
+                                    <th>Người nhập</th>
+                                    <th>Chi tiết nguyên liệu (+)</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyInBody"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="card">
+                        <h3>Lịch sử Xuất kho (Trừ tự động khi thanh toán đơn)</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Đơn hàng & Thời gian</th>
+                                    <th>Thu ngân</th>
+                                    <th>Nguyên liệu đã trừ (-)</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyOutBody"></tbody>
+                        </table>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/inventory.js"></script>
+</body>
+</html>
