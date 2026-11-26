@@ -3,6 +3,12 @@
 
 const AUTH_STORAGE_KEY = 'milkytea_auth';
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+}
+
 function getAuthSession() {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
     if (!raw) return null;

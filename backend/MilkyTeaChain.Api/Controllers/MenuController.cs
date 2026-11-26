@@ -42,12 +42,28 @@ public class MenuController : ControllerBase
 
     [HttpPost("products")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateProduct([FromBody] SaveProductRequest request)
+    [HttpPut("products/{productId:int}")]
+    public async Task<IActionResult> SaveProduct([FromBody] SaveProductRequest request, [FromRoute] int? productId = null)
     {
         try
         {
-            var product = await _menuService.CreateProductAsync(request);
+            var product = await _menuService.SaveProductAsync(request, productId);
             return Ok(product);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("products/{productId:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RemoveProduct(int productId)
+    {
+        try
+        {
+            await _menuService.RemoveProductAsync(productId);
+            return NoContent();
         }
         catch (KeyNotFoundException ex)
         {

@@ -239,6 +239,8 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
+        await SeedAdditionalDrinksAsync(context, milk, sugar);
+
         // 6. Đảm bảo tất cả các chi nhánh mẫu (DN01, DN02, HUE01) đều có tồn kho nguyên liệu
         var allIngredients = await context.Ingredients.ToListAsync();
         foreach (var branch in new[] { branch1, branch2, branch3 })
@@ -258,6 +260,71 @@ public static class DbSeeder
                 });
             }
         }
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedAdditionalDrinksAsync(AppDbContext context, Ingredient milk, Ingredient sugar)
+    {
+        var categories = await context.Categories.Where(c => c.Name == "Trà sữa" || c.Name == "Cà phê")
+            .ToDictionaryAsync(c => c.Name);
+        if (!categories.TryGetValue("Trà sữa", out var milkTea) || !categories.TryGetValue("Cà phê", out var coffee))
+        {
+            return;
+        }
+
+        var ingredients = await context.Ingredients
+            .Where(i => i.Name == "Bột matcha" || i.Name == "Cốt cà phê" || i.Name == "Sữa đặc")
+            .ToDictionaryAsync(i => i.Name);
+
+        Ingredient GetIngredient(string name, string unit)
+        {
+            if (!ingredients.TryGetValue(name, out var ingredient))
+            {
+                ingredient = new Ingredient { Name = name, Unit = unit, IsActive = true };
+                context.Ingredients.Add(ingredient);
+                ingredients.Add(name, ingredient);
+            }
+            return ingredient;
+        }
+
+        var matcha = GetIngredient("Bột matcha", "g");
+        var coffeeBase = GetIngredient("Cốt cà phê", "ml");
+        var condensedMilk = GetIngredient("Sữa đặc", "ml");
+        var existingNames = await context.Products.Select(p => p.Name).ToListAsync();
+
+        void AddDrink(string name, Category category, decimal mediumPrice, decimal largePrice,
+            params (Ingredient Ingredient, decimal Medium, decimal Large)[] recipe)
+        {
+            if (existingNames.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            context.Products.Add(new Product
+            {
+                Name = name,
+                Category = category,
+                Variants = new List<ProductVariant>
+                {
+                    new()
+                    {
+                        Size = "M", Price = mediumPrice,
+                        RecipeItems = recipe.Select(r => new VariantRecipeItem
+                            { Ingredient = r.Ingredient, Quantity = r.Medium }).ToList()
+                    },
+                    new()
+                    {
+                        Size = "L", Price = largePrice,
+                        RecipeItems = recipe.Select(r => new VariantRecipeItem
+                            { Ingredient = r.Ingredient, Quantity = r.Large }).ToList()
+                    }
+                }
+            });
+        }
+
+        AddDrink("Trà sữa matcha", milkTea, 35000m, 42000m, (matcha, 4m, 6m), (milk, 160m, 220m), (sugar, 20m, 25m));
+        AddDrink("Cà phê sữa đá", coffee, 29000m, 35000m, (coffeeBase, 60m, 85m), (condensedMilk, 30m, 40m));
+        AddDrink("Bạc xỉu", coffee, 32000m, 39000m, (coffeeBase, 35m, 50m), (condensedMilk, 25m, 35m), (milk, 120m, 160m));
         await context.SaveChangesAsync();
     }
 

@@ -42,19 +42,7 @@ public class UserService
             throw new InvalidOperationException($"Tên đăng nhập '{username}' đã tồn tại.");
         }
 
-        if (request.Role != UserRole.Admin)
-        {
-            if (!request.BranchId.HasValue)
-            {
-                throw new ArgumentException($"Tài khoản vai trò {request.Role} bắt buộc phải gán vào một chi nhánh.");
-            }
-
-            var branchExists = await _context.Branches.AnyAsync(b => b.Id == request.BranchId.Value && b.IsActive);
-            if (!branchExists)
-            {
-                throw new KeyNotFoundException($"Chi nhánh mã {request.BranchId.Value} không tồn tại hoặc đã ngừng hoạt động.");
-            }
-        }
+        var branchId = await ResolveBranchAsync(request.Role, request.BranchId);
 
         var user = new User
         {
@@ -62,7 +50,7 @@ public class UserService
             PasswordHash = HashPassword(request.Password),
             FullName = request.FullName.Trim(),
             Role = request.Role,
-            BranchId = request.Role == UserRole.Admin ? null : request.BranchId,
+            BranchId = branchId,
             IsActive = true
         };
 
@@ -83,6 +71,36 @@ public class UserService
             BranchName = branch?.Name,
             IsActive = user.IsActive
         };
+    }
+
+    public async Task UpdateRoleAsync(int id, UserRole role, int? branchId)
+    {
+        var user = await _context.Users.FindAsync(id)
+            ?? throw new KeyNotFoundException($"Không tìm thấy tài khoản mã {id}.");
+        user.BranchId = await ResolveBranchAsync(role, branchId);
+        user.Role = role;
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task<int?> ResolveBranchAsync(UserRole role, int? branchId)
+    {
+        if (!Enum.IsDefined(role))
+        {
+            throw new ArgumentException("Vai trò không hợp lệ.");
+        }
+        if (role == UserRole.Admin)
+        {
+            return null;
+        }
+        if (!branchId.HasValue)
+        {
+            throw new ArgumentException("Vui lòng chọn chi nhánh cho tài khoản.");
+        }
+        if (!await _context.Branches.AnyAsync(b => b.Id == branchId && b.IsActive))
+        {
+            throw new KeyNotFoundException("Chi nhánh không tồn tại hoặc đã ngừng hoạt động.");
+        }
+        return branchId;
     }
 
     public static string HashPassword(string password)

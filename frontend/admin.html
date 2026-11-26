@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản trị Hệ thống – Milky Tea – Trà sữa & Cà phê</title>
-    <link rel="stylesheet" href="/css/site.css?v=milky-theme-4">
+    <link rel="stylesheet" href="/css/site.css?v=milky-theme-5">
 </head>
 <body>
     <div class="app-shell">
@@ -42,7 +42,11 @@
                     <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ Menu</button>
                     <h2>Quản trị hệ thống</h2>
                 </div>
-                <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+                <div class="workspace-actions">
+                    <a id="adminSwaggerLink" class="btn btn-secondary hidden" href="/swagger/index.html"
+                       target="_blank" rel="noopener" style="text-decoration:none;">Mở Swagger</a>
+                    <div id="topbarBranchPill" class="branch-pill">Chi nhánh làm việc</div>
+                </div>
             </header>
 
             <main class="content-wrapper">
@@ -58,9 +62,9 @@
 
                 <!-- MỤC 1: ĐƠN HÀNG -->
                 <section id="panelOrders" class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:0.85rem;">
+                    <div class="workspace-toolbar">
                         <h3 style="margin-bottom:0; border:none;">Quản lý & Tra cứu Đơn hàng</h3>
-                        <div style="display:flex; gap:0.65rem; align-items:center; flex-wrap:wrap;">
+                        <div class="workspace-actions">
                             <select id="orderFilterBranch" onchange="loadAdminOrders()" style="width:auto; min-width:210px;"></select>
                             <select id="orderFilterStatus" onchange="loadAdminOrders()" style="width:auto;">
                                 <option value="">Tất cả trạng thái</option>
@@ -124,6 +128,19 @@
 
                         <div>
                             <h4>Danh sách nhân viên toàn chuỗi</h4>
+                            <form id="editUserRoleForm" class="card hidden" onsubmit="handleUpdateUserRole(event)">
+                                <h4 id="editUserRoleTitle">Đổi vai trò</h4>
+                                <div class="form-group">
+                                    <label for="editUserRoleSelect">Vai trò mới</label>
+                                    <select id="editUserRoleSelect" onchange="syncEditUserBranch()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editUserBranchSelect">Chi nhánh</label>
+                                    <select id="editUserBranchSelect"></select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Lưu vai trò</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeUserRoleEditor()">Hủy</button>
+                            </form>
                             <div class="workspace-table" tabindex="0" role="region" aria-label="Bảng dữ liệu">
                                 <table>
                                     <thead>
@@ -133,6 +150,7 @@
                                             <th>Họ tên</th>
                                             <th>Vai trò</th>
                                             <th>Chi nhánh</th>
+                                            <th>Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody id="usersTableBody"></tbody>
@@ -285,7 +303,7 @@
 
                     <!-- Khu vực Thêm mới Danh mục / Món / Size / Topping (Chỉ Admin) -->
                     <div id="adminOnlyMenuCreation" class="card">
-                        <h4>3. Thêm mới Danh mục, Món, Size hoặc Topping (Dành cho Admin)</h4>
+                        <h4>3. Quản lý danh mục, món, size và topping</h4>
                         <div class="grid-2">
                             <div>
                                 <form onsubmit="handleCreateCategory(event)" style="margin-bottom:1rem;">
@@ -296,13 +314,23 @@
                                     </div>
                                 </form>
 
-                                <form onsubmit="handleCreateProduct(event)">
-                                    <label style="font-weight:600; display:block; margin-bottom:0.3rem;">Thêm món mới vào danh mục</label>
-                                    <div style="display:flex; gap:0.5rem;">
-                                        <select id="prodCategorySelect" style="max-width:160px;"></select>
-                                        <input type="text" id="prodNameInput" placeholder="VD: Trà đào cam sả" required>
-                                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Thêm món</button>
+                                <form onsubmit="handleSaveProduct(event)">
+                                    <div class="form-group">
+                                        <label for="editProductSelect">Chọn món để chỉnh sửa</label>
+                                        <select id="editProductSelect" onchange="syncProductEditor()">
+                                            <option value="">Thêm món mới</option>
+                                        </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="prodCategorySelect">Danh mục</label>
+                                        <select id="prodCategorySelect" required></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prodNameInput">Tên món</label>
+                                        <input type="text" id="prodNameInput" maxlength="150" required>
+                                    </div>
+                                    <button type="submit" id="saveProductButton" class="btn btn-primary">Thêm món</button>
+                                    <button type="button" id="removeProductButton" class="btn btn-danger hidden" onclick="handleRemoveProduct()">Xóa món</button>
                                 </form>
                             </div>
 
@@ -442,8 +470,8 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
+    <script src="/js/api.js?v=product-role-1"></script>
     <script src="/js/auth.js"></script>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js?v=swagger-link-1"></script>
 </body>
 </html>

@@ -14,10 +14,15 @@ let currentSession = null;
 let branchesCache = [];
 let menuDataCache = { categories: [], toppings: [] };
 let pendingPriceConfirmAction = null;
+let usersCache = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     currentSession = requireAuth(['Manager', 'Admin']);
     if (!currentSession) return;
+
+    if (currentSession.role === 'Admin') {
+        document.getElementById('adminSwaggerLink')?.classList.remove('hidden');
+    }
 
     branchesCache = await apiRequest('/api/branches');
 
@@ -97,7 +102,7 @@ async function loadAdminOrders() {
             const itemsSummary = (o.items || []).map(i => {
                 const top = (i.toppings && i.toppings.length > 0) ? ` + ${i.toppings.join(', ')}` : '';
                 const note = i.note ? ` (${i.note})` : '';
-                return `${i.productName} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}${top}${note}`;
+                return `${escapeHtml(i.productName)} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}${top}${note}`;
             }).join('<br>');
 
             const custText = o.customerName ? `<br><small style="color:var(--primary);">KH: ${o.customerName} (+${o.pointsEarned || 0}đ)</small>` : '';
@@ -142,16 +147,66 @@ function onNewUserRoleChange() {
 async function loadUsersList() {
     const tbody = document.getElementById('usersTableBody');
     try {
-        const users = await apiRequest('/api/users');
-        tbody.innerHTML = users.map(u => `
+        usersCache = await apiRequest('/api/users');
+        tbody.innerHTML = usersCache.map(u => `
             <tr>
                 <td>#${u.id}</td>
                 <td><strong>${u.username}</strong></td>
                 <td>${u.fullName}</td>
                 <td><span class="badge badge-pending">${u.role}</span></td>
                 <td>${u.branchName || (u.branchId ? '#' + u.branchId : 'Toàn chuỗi')}</td>
+                <td>${u.id === Number(currentSession.userId) ? 'Tài khoản của bạn' :
+                    `<button type="button" class="btn btn-secondary btn-sm" onclick="openUserRoleEditor(${u.id})">Đổi vai trò</button>`}</td>
             </tr>
         `).join('');
+    } catch (err) {
+        showMessage('adminMessage', err.message, 'error');
+    }
+}
+
+function openUserRoleEditor(id) {
+    const user = usersCache.find(item => item.id === id);
+    if (!user) return;
+    const form = document.getElementById('editUserRoleForm');
+    form.dataset.userId = id;
+    document.getElementById('editUserRoleTitle').textContent = `Đổi vai trò của ${user.username}`;
+    const role = document.getElementById('editUserRoleSelect');
+    const branch = document.getElementById('editUserBranchSelect');
+    role.innerHTML = document.getElementById('newUserRoleSelect').innerHTML;
+    branch.replaceChildren(new Option('Chọn chi nhánh', ''), ...branchesCache
+        .filter(item => item.isActive)
+        .map(item => new Option(`${item.name} (${item.code})`, item.id)));
+    role.value = user.role;
+    branch.value = user.branchId ?? '';
+    syncEditUserBranch();
+    form.classList.remove('hidden');
+    role.focus();
+}
+
+function closeUserRoleEditor() {
+    const form = document.getElementById('editUserRoleForm');
+    form.classList.add('hidden');
+    delete form.dataset.userId;
+}
+
+function syncEditUserBranch() {
+    const role = document.getElementById('editUserRoleSelect');
+    const branch = document.getElementById('editUserBranchSelect');
+    branch.disabled = role.value === 'Admin';
+    branch.required = !branch.disabled;
+    if (branch.disabled) branch.value = '';
+}
+
+async function handleUpdateUserRole(event) {
+    event.preventDefault();
+    const id = event.currentTarget.dataset.userId;
+    const role = document.getElementById('editUserRoleSelect').value;
+    const branchId = Number(document.getElementById('editUserBranchSelect').value) || null;
+    try {
+        await apiRequest(`/api/users/${id}/role`, { method: 'PUT', body: JSON.stringify({ role, branchId }) });
+        closeUserRoleEditor();
+        await loadUsersList();
+        showMessage('adminMessage', 'Đã cập nhật vai trò và chi nhánh.', 'success');
     } catch (err) {
         showMessage('adminMessage', err.message, 'error');
     }
@@ -541,7 +596,7 @@ async function loadAdminMenuData() {
 
         const catSel = document.getElementById('prodCategorySelect');
         if (catSel) {
-            catSel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            catSel.replaceChildren(...categories.map(c => new Option(c.name, c.id)));
         }
 
         const allProds = [];
@@ -562,7 +617,15 @@ async function loadAdminMenuData() {
 
         const prodSel = document.getElementById('varProductSelect');
         if (prodSel) {
-            prodSel.innerHTML = allProds.map(p => `<option value="${p.id}">${p.name} (${p.categoryName})</option>`).join('');
+            prodSel.replaceChildren(...allProds.map(p => new Option(`${p.name} (${p.categoryName})`, p.id)));
+        }
+        const editProductSelect = document.getElementById('editProductSelect');
+        if (editProductSelect) {
+            const selectedId = editProductSelect.value;
+            editProductSelect.replaceChildren(new Option('Thêm món mới', ''), ...allProds
+                .map(p => new Option(`${p.name} (${p.categoryName})`, p.id)));
+            editProductSelect.value = allProds.some(p => String(p.id) === selectedId) ? selectedId : '';
+            syncProductEditor();
         }
 
         // Bảng giá từng món & size
@@ -574,23 +637,23 @@ async function loadAdminMenuData() {
                 : `<span style="color:var(--muted);">Đang dùng giá chung</span>`;
 
             const adminDefaultBtn = currentSession.role === 'Admin'
-                ? `<button type="button" class="btn btn-primary btn-sm" onclick="promptPriceChange('VariantDefault', ${v.id}, '${v.productName}', 'Size ${v.size}', ${v.defaultPrice}, ${v.productId})">Đổi giá chung</button>`
+                ? `<button type="button" class="btn btn-primary btn-sm" onclick="promptPriceChange('VariantDefault', ${v.id}, ${escapeHtml(JSON.stringify(v.productName))}, ${escapeHtml(JSON.stringify("Size " + v.size))}, ${v.defaultPrice}, ${v.productId})">Đổi giá chung</button>`
                 : '';
 
             const resetBtn = hasOverride
-                ? `<button type="button" class="btn btn-warning btn-sm" onclick="promptResetToDefault('VariantReset', ${v.id}, '${v.productName} (Size ${v.size})', ${v.effectivePrice}, ${v.defaultPrice})">Dùng lại giá chung</button>`
+                ? `<button type="button" class="btn btn-warning btn-sm" onclick="promptResetToDefault('VariantReset', ${v.id}, ${escapeHtml(JSON.stringify(v.productName + " (Size " + v.size + ")"))}, ${v.effectivePrice}, ${v.defaultPrice})">Dùng lại giá chung</button>`
                 : '';
 
             return `
                 <tr>
-                    <td><strong>${v.productName}</strong> <small style="color:var(--muted);">(${v.categoryName})</small></td>
+                    <td><strong>${escapeHtml(v.productName)}</strong> <small style="color:var(--muted);">(${escapeHtml(v.categoryName)})</small></td>
                     <td><strong>Size ${v.size}</strong></td>
                     <td class="text-right">${formatCurrency(v.defaultPrice)}</td>
                     <td class="text-right">${overrideBadge}</td>
                     <td class="text-right"><strong style="color:var(--primary-dark); font-size:1rem;">${formatCurrency(v.effectivePrice)}</strong></td>
                     <td class="text-right" style="white-space:nowrap;">
                         ${adminDefaultBtn}
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="promptPriceChange('VariantBranch', ${v.id}, '${v.productName}', 'Size ${v.size}', ${v.effectivePrice}, ${v.productId})">Đặt giá riêng CN</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="promptPriceChange('VariantBranch', ${v.id}, ${escapeHtml(JSON.stringify(v.productName))}, ${escapeHtml(JSON.stringify("Size " + v.size))}, ${v.effectivePrice}, ${v.productId})">Đặt giá riêng CN</button>
                         ${resetBtn}
                     </td>
                 </tr>
@@ -753,7 +816,7 @@ async function loadPriceChangeHistory() {
             <tr>
                 <td>${new Date(h.changedAt).toLocaleString('vi-VN')}</td>
                 <td><strong>${h.changedByName}</strong></td>
-                <td><strong>${h.itemName}</strong></td>
+                <td><strong>${escapeHtml(h.itemName)}</strong></td>
                 <td><span class="badge badge-pending">${h.scopeName}</span></td>
                 <td class="text-right">${formatCurrency(h.oldPrice)} &rarr; <strong style="color:var(--primary-dark);">${formatCurrency(h.newPrice)}</strong></td>
             </tr>
@@ -779,18 +842,42 @@ async function handleCreateCategory(event) {
     }
 }
 
-async function handleCreateProduct(event) {
+function syncProductEditor() {
+    const id = Number(document.getElementById('editProductSelect').value);
+    const category = menuDataCache.categories.find(c => c.products.some(p => p.id === id));
+    const product = category?.products.find(p => p.id === id);
+    document.getElementById('prodNameInput').value = product?.name ?? '';
+    if (category) document.getElementById('prodCategorySelect').value = category.id;
+    document.getElementById('saveProductButton').textContent = product ? 'Lưu thay đổi' : 'Thêm món';
+    document.getElementById('removeProductButton').classList.toggle('hidden', !product);
+}
+
+async function handleSaveProduct(event) {
     event.preventDefault();
+    const id = document.getElementById('editProductSelect').value;
     const categoryId = Number(document.getElementById('prodCategorySelect').value);
     const name = document.getElementById('prodNameInput').value.trim();
     try {
-        await apiRequest('/api/menu/products', {
-            method: 'POST',
+        await apiRequest(id ? `/api/menu/products/${id}` : '/api/menu/products', {
+            method: id ? 'PUT' : 'POST',
             body: JSON.stringify({ categoryId, name })
         });
         document.getElementById('prodNameInput').value = '';
         await loadAdminMenuData();
-        showMessage('adminMessage', `Đã thêm món '${name}'.`, 'success');
+        showMessage('adminMessage', id ? `Đã cập nhật món '${name}'.` : `Đã thêm món '${name}'.`, 'success');
+    } catch (err) {
+        showMessage('adminMessage', err.message, 'error');
+    }
+}
+
+async function handleRemoveProduct() {
+    const id = document.getElementById('editProductSelect').value;
+    const name = document.getElementById('prodNameInput').value;
+    if (!id || !confirm(`Xóa món “${name}” khỏi thực đơn đang bán? Lịch sử đơn hàng được giữ lại.`)) return;
+    try {
+        await apiRequest(`/api/menu/products/${id}`, { method: 'DELETE' });
+        await loadAdminMenuData();
+        showMessage('adminMessage', `Đã xóa món '${name}' khỏi thực đơn.`, 'success');
     } catch (err) {
         showMessage('adminMessage', err.message, 'error');
     }

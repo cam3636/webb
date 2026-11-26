@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quầy Pha chế (Barista) – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=milky-theme-4">
+    <link rel="stylesheet" href="/css/site.css?v=milky-theme-5">
 </head>
 <body>
     <div class="app-shell">
@@ -48,12 +48,12 @@
             <main class="content-wrapper">
                 <div id="baristaMessage" class="alert hidden"></div>
 
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-                    <div style="display:flex; align-items:center; gap:0.65rem;">
+                <div class="card workspace-toolbar">
+                    <div class="workspace-actions">
                         <strong id="branchStaticLabel">Quầy pha chế Chi nhánh</strong>
-                        <select id="branchSelect" class="hidden" onchange="loadBaristaOrders()" style="width:auto; min-width:240px;"></select>
+                        <select id="branchSelect" class="hidden" onchange="loadBaristaOrders()" aria-label="Chi nh?nh pha ch?"></select>
                     </div>
-                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div class="workspace-actions">
                         <small id="lastSyncTime" style="color:var(--muted);">Tự động cập nhật mỗi 5 giây</small>
                         <button type="button" class="btn btn-primary btn-sm" onclick="loadBaristaOrders()">🔄 Làm mới ngay</button>
                     </div>
@@ -80,8 +80,8 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
+    <script src="/js/api.js?v=product-role-1"></script>
     <script src="/js/auth.js"></script>
-    <script src="/js/barista.js"></script>
+    <script src="/js/barista.js?v=product-role-1"></script>
 </body>
 </html>

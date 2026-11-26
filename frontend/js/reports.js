@@ -92,7 +92,7 @@ async function loadRevenueReport() {
         } else {
             tbody.innerHTML = sales.map(s => `
                 <tr>
-                    <td><strong>${s.productName}</strong></td>
+                    <td><strong>${escapeHtml(s.productName)}</strong></td>
                     <td>Size ${s.size}</td>
                     <td>${s.quantitySold}</td>
                     <td class="text-right"><strong>${formatCurrency(s.totalSalesAmount)}</strong></td>
@@ -142,7 +142,7 @@ async function loadPaidOrdersTable(branchId, fromStr, toStr) {
             const summary = (o.items || []).map(i => {
                 const top = (i.toppings && i.toppings.length > 0) ? ` [${i.toppings.join(', ')}]` : '';
                 const note = i.note ? ` (${i.note})` : '';
-                return `${i.productName} (${i.size}) x${i.quantity}${top}${note}`;
+                return `${escapeHtml(i.productName)} (${i.size}) x${i.quantity}${top}${note}`;
             }).join('<br>');
 
             const paidTime = o.paidAt ? new Date(o.paidAt).toLocaleString('vi-VN') : '-';

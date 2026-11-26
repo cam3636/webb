@@ -116,7 +116,7 @@ public class MenuService
         return category;
     }
 
-    public async Task<Product> CreateProductAsync(SaveProductRequest request)
+    public async Task<Product> SaveProductAsync(SaveProductRequest request, int? productId = null)
     {
         var categoryExists = await _context.Categories.AnyAsync(c => c.Id == request.CategoryId && c.IsActive);
         if (!categoryExists)
@@ -124,17 +124,30 @@ public class MenuService
             throw new KeyNotFoundException($"Không tìm thấy danh mục mã {request.CategoryId}.");
         }
 
-        var product = new Product
-        {
-            CategoryId = request.CategoryId,
-            Name = request.Name.Trim(),
-            IsActive = true
-        };
+        var product = productId.HasValue
+            ? await FindActiveProductAsync(productId.Value)
+            : new Product();
+        product.CategoryId = request.CategoryId;
+        product.Name = request.Name.Trim();
 
-        _context.Products.Add(product);
+        if (!productId.HasValue)
+        {
+            _context.Products.Add(product);
+        }
         await _context.SaveChangesAsync();
         return product;
     }
+
+    public async Task RemoveProductAsync(int productId)
+    {
+        var product = await FindActiveProductAsync(productId);
+        product.IsActive = false;
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task<Product> FindActiveProductAsync(int productId) =>
+        await _context.Products.FirstOrDefaultAsync(p => p.Id == productId && p.IsActive)
+        ?? throw new KeyNotFoundException($"Không tìm thấy món mã {productId}.");
 
     public async Task<ProductVariant> SaveVariantAsync(ClaimsPrincipal user, SaveVariantRequest request)
     {

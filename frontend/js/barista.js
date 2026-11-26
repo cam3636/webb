@@ -121,7 +121,7 @@ function renderOrderCard(order, stage) {
         return `
             <div style="padding:0.45rem 0; border-bottom:1px dashed var(--cream-border);">
                 <div style="display:flex; justify-content:space-between;">
-                    <strong>${item.productName} (Size ${item.size})</strong>
+                    <strong>${escapeHtml(item.productName)} (Size ${item.size})</strong>
                     <span class="badge badge-pending">SL: ${item.quantity} ly</span>
                 </div>
                 ${topText}

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,6 +58,23 @@ builder.Services
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var principal = context.Principal!;
+                var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                var user = int.TryParse(principal.FindFirstValue(ClaimTypes.NameIdentifier), out var id)
+                    ? await db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id, context.HttpContext.RequestAborted)
+                    : null;
+                if (user is null || !user.IsActive ||
+                    principal.FindFirstValue(ClaimTypes.Role) != user.Role.ToString() ||
+                    principal.FindFirstValue("BranchId") != user.BranchId?.ToString())
+                {
+                    context.Fail("Phiên đăng nhập đã hết hiệu lực. Vui lòng đăng nhập lại.");
+                }
+            }
         };
     });
 

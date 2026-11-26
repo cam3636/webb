@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khách hàng Thân thiết – Milky Tea Chain</title>
-    <link rel="stylesheet" href="/css/site.css?v=milky-theme-4">
+    <link rel="stylesheet" href="/css/site.css?v=milky-theme-5">
 </head>
 <body>
     <div class="app-shell">
@@ -58,8 +58,8 @@
                         <p style="font-size:0.86rem; color:var(--muted); margin-bottom:0.75rem;">
                             Một số điện thoại dùng chung một hồ sơ trên toàn chuỗi. Hệ thống tự chuẩn hóa số điện thoại khi tìm hoặc lưu.
                         </p>
-                        <div style="display:flex; gap:0.5rem;">
-                            <input type="text" id="lookupPhoneInput" placeholder="Nhập SĐT (VD: 0909123456 hoặc +84909123456)...">
+                        <div class="workspace-actions customer-search">
+                            <input type="text" id="lookupPhoneInput" aria-label="S? ?i?n tho?i c?n tra c?u" placeholder="Nhập SĐT (VD: 0909123456 hoặc +84909123456)...">
                             <button type="button" class="btn btn-primary" style="white-space:nowrap;" onclick="lookupSingleCustomer()">🔍 Tìm khách</button>
                         </div>
                         <div id="lookupSingleResult" class="hidden" style="margin-top:0.85rem;"></div>
@@ -85,13 +85,13 @@
                 <!-- Danh bạ khách hàng & Lịch sử giao dịch (Dành cho Admin & Manager) -->
                 <div id="fullDirectorySection">
                     <section class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.75rem;">
+                        <div class="workspace-toolbar">
                             <div>
                                 <h3 style="margin-bottom:0; border:none;">Danh sách Khách hàng Thân thiết</h3>
                                 <small id="directoryScopeLabel" style="color:var(--muted); font-weight:600;"></small>
                             </div>
-                            <div style="display:flex; gap:0.5rem;">
-                                <input type="text" id="dirSearchInput" placeholder="Tìm theo tên hoặc SĐT..." oninput="loadCustomersDirectory()" style="width:220px;">
+                            <div class="workspace-actions">
+                                <input type="text" id="dirSearchInput" aria-label="T?m trong danh s?ch kh?ch h?ng" placeholder="Tìm theo tên hoặc SĐT..." oninput="loadCustomersDirectory()" style="width:220px;">
                                 <button type="button" class="btn btn-secondary btn-sm" onclick="loadCustomersDirectory()">🔄 Làm mới</button>
                             </div>
                         </div>
@@ -136,7 +136,7 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
+    <script src="/js/api.js?v=product-role-1"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/customers.js"></script>
 </body>

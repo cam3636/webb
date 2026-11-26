@@ -11,6 +11,12 @@ let branchesList = [];
 let menuCategories = [];
 let menuToppings = [];
 let flatProducts = [];
+const drinkPhotos = new Map([
+    ['trà sữa truyền thống', 'classic-milk-tea'],
+    ['trà sữa matcha', 'matcha-milk-tea'],
+    ['cà phê sữa đá', 'iced-milk-coffee'],
+    ['bạc xỉu', 'bac-xiu']
+]);
 let selectedCategoryId = 'ALL';
 let cart = [];
 let editingCartIndex = null;
@@ -250,6 +256,7 @@ function renderProductCards() {
     }
 
     grid.innerHTML = filtered.map(p => {
+        const photo = drinkPhotos.get(p.name.trim().toLowerCase());
         const variantsText = (p.variants || [])
             .map(v => {
                 const eff = v.effectivePrice ?? v.price;
@@ -261,8 +268,9 @@ function renderProductCards() {
         return `
             <div class="product-card" onclick="openItemModal(${p.id})">
                 <div>
-                    <div class="cat-tag">${p.categoryName}</div>
-                    <div class="prod-title">${p.name}</div>
+                    ${photo ? `<img class="product-photo" src="/images/drinks/${photo}.jpg" alt="" width="480" height="480" loading="lazy">` : ''}
+                    <div class="cat-tag">${escapeHtml(p.categoryName)}</div>
+                    <div class="prod-title">${escapeHtml(p.name)}</div>
                     <div class="size-prices">${variantsText || 'Chưa cấu hình giá'}</div>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" style="width:100%;">+ Chọn Size & Topping</button>
@@ -431,7 +439,7 @@ function renderCart() {
         return `
             <tr>
                 <td>
-                    <strong>${item.productName}</strong> (Size ${item.size})
+                    <strong>${escapeHtml(item.productName)}</strong> (Size ${item.size})
                     <div style="font-size:0.8rem; color:var(--muted);">${toppingText}</div>
                     ${noteHtml}
                 </td>
@@ -660,7 +668,7 @@ function renderOrderDetails(order) {
     itemsBody.innerHTML = (order.items || []).map(i => `
         <tr>
             <td>
-                <strong>${i.productName}</strong> (Size ${i.size})
+                <strong>${escapeHtml(i.productName)}</strong> (Size ${i.size})
                 ${i.note ? `<div style="font-size:0.8rem; color:#92400e;">Ghi chú: ${i.note}</div>` : ''}
             </td>
             <td>${(i.toppings && i.toppings.length > 0) ? i.toppings.join(', ') : 'Không'}</td>
@@ -691,7 +699,7 @@ async function loadBranchOrdersAtPos() {
             const id = o.orderId || o.id;
             const timeStr = new Date(o.paidAt || o.createdAt).toLocaleString('vi-VN');
             const cust = o.customerName ? `${o.customerName} (${o.customerPhone}) +${o.pointsEarned || 0}đ` : 'Khách lẻ';
-            const itemsText = (o.items || []).map(i => `${i.productName} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}`).join(', ');
+            const itemsText = (o.items || []).map(i => `${escapeHtml(i.productName)} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}`).join(', ');
             const statusBadge = o.status === 'Paid'
                 ? '<span class="badge badge-paid">Paid</span>'
                 : '<span class="badge badge-pending">Pending</span>';
@@ -737,7 +745,7 @@ function renderPrintableReceipt(order) {
         const noteText = i.note ? `<br>&nbsp;&nbsp;* Ghi chú: ${i.note}` : '';
         return `
             <div style="display:flex; justify-content:space-between; margin:0.35rem 0;">
-                <span>${i.productName} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}${topText}${noteText}</span>
+                <span>${escapeHtml(i.productName)} (${i.size} - ${formatCurrency(i.unitPrice)}) x${i.quantity}${topText}${noteText}</span>
                 <strong>${formatCurrency(i.lineTotal)}</strong>
             </div>
         `;
